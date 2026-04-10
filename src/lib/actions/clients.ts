@@ -8,26 +8,35 @@ export async function createClient(formData: FormData) {
   const supabase = await createServerSupabaseClient()
 
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('Not authenticated')
+  if (!user) {
+    redirect('/login')
+  }
 
   const socialNetworks: Record<string, boolean> = {}
   const networks = ['instagram', 'tiktok', 'youtube', 'facebook']
   networks.forEach((net) => {
-    if (formData.get(net) === 'on') socialNetworks[net] = true
+    const val = formData.get(net)
+    if (val === 'on' || val === 'true' || val !== null) {
+      // Check if the checkbox was actually included in formData
+      if (formData.has(net)) socialNetworks[net] = true
+    }
   })
 
   const { error } = await supabase.from('clients').insert({
     name: formData.get('name') as string,
     niche: formData.get('niche') as string,
-    target_audience: formData.get('target_audience') as string,
-    tone_of_voice: formData.get('tone_of_voice') as string,
-    main_products: formData.get('main_products') as string,
+    target_audience: (formData.get('target_audience') as string) || '',
+    tone_of_voice: (formData.get('tone_of_voice') as string) || '',
+    main_products: (formData.get('main_products') as string) || '',
     social_networks: socialNetworks,
-    content_examples: formData.get('content_examples') as string,
+    content_examples: (formData.get('content_examples') as string) || '',
     created_by: user.id,
   })
 
-  if (error) throw new Error(error.message)
+  if (error) {
+    console.error('Create client error:', error)
+    throw new Error(error.message)
+  }
 
   revalidatePath('/clients')
   redirect('/clients')
@@ -39,7 +48,7 @@ export async function updateClient(id: string, formData: FormData) {
   const socialNetworks: Record<string, boolean> = {}
   const networks = ['instagram', 'tiktok', 'youtube', 'facebook']
   networks.forEach((net) => {
-    if (formData.get(net) === 'on') socialNetworks[net] = true
+    if (formData.has(net)) socialNetworks[net] = true
   })
 
   const { error } = await supabase
@@ -47,15 +56,18 @@ export async function updateClient(id: string, formData: FormData) {
     .update({
       name: formData.get('name') as string,
       niche: formData.get('niche') as string,
-      target_audience: formData.get('target_audience') as string,
-      tone_of_voice: formData.get('tone_of_voice') as string,
-      main_products: formData.get('main_products') as string,
+      target_audience: (formData.get('target_audience') as string) || '',
+      tone_of_voice: (formData.get('tone_of_voice') as string) || '',
+      main_products: (formData.get('main_products') as string) || '',
       social_networks: socialNetworks,
-      content_examples: formData.get('content_examples') as string,
+      content_examples: (formData.get('content_examples') as string) || '',
     })
     .eq('id', id)
 
-  if (error) throw new Error(error.message)
+  if (error) {
+    console.error('Update client error:', error)
+    throw new Error(error.message)
+  }
 
   revalidatePath(`/clients/${id}`)
   revalidatePath('/clients')
@@ -67,7 +79,10 @@ export async function deleteClient(id: string) {
 
   const { error } = await supabase.from('clients').delete().eq('id', id)
 
-  if (error) throw new Error(error.message)
+  if (error) {
+    console.error('Delete client error:', error)
+    throw new Error(error.message)
+  }
 
   revalidatePath('/clients')
   redirect('/clients')
