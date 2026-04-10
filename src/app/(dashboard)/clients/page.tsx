@@ -6,6 +6,8 @@ import { Badge } from '@/components/ui/badge'
 import { Plus } from 'lucide-react'
 import type { Client } from '@/types'
 
+export const dynamic = 'force-dynamic'
+
 export default async function ClientsPage() {
   const supabase = await createServerSupabaseClient()
   const { data: clients } = await supabase

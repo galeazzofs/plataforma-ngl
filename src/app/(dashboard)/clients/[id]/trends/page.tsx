@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation'
 import { TrendList } from '@/components/trend-list'
 import type { Trend } from '@/types'
 
+export const dynamic = 'force-dynamic'
+
 export default async function TrendsPage({
   params,
 }: {

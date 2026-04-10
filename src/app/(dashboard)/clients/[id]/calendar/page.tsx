@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation'
 import { CalendarGrid } from '@/components/calendar-grid'
 import type { ContentItem } from '@/types'
 
+export const dynamic = 'force-dynamic'
+
 export default async function CalendarPage({
   params,
 }: {

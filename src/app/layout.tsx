@@ -1,11 +1,8 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { Toaster } from "sonner";
-
-const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -20,7 +17,7 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: "ContentOS",
-  description: "Gestão criativa para agências de marketing de vídeo",
+  description: "Gestao criativa para agencias de marketing de video",
 };
 
 export default function RootLayout({
@@ -29,9 +26,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" className={cn("font-sans", geist.variable)}>
+    <html lang="pt-BR">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={cn(geistSans.variable, geistMono.variable, "antialiased")}
       >
         {children}
         <Toaster richColors position="top-right" />

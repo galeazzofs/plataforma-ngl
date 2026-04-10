@@ -2,6 +2,8 @@ import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { KanbanBoard } from '@/components/kanban-board'
 import type { ContentItem } from '@/types'
 
+export const dynamic = 'force-dynamic'
+
 export default async function KanbanPage() {
   const supabase = await createServerSupabaseClient()
 

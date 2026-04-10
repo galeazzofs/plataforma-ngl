@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge'
 import type { Profile } from '@/types'
 
+export const dynamic = 'force-dynamic'
+
 export default async function SettingsPage() {
   const supabase = await createServerSupabaseClient()
 

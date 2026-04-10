@@ -2,6 +2,8 @@ import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { DashboardStats } from '@/components/dashboard-stats'
 import type { Client, ContentItem } from '@/types'
 
+export const dynamic = 'force-dynamic'
+
 export default async function DashboardPage() {
   const supabase = await createServerSupabaseClient()
 

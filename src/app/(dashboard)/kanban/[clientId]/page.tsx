@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation'
 import { KanbanBoard } from '@/components/kanban-board'
 import type { ContentItem } from '@/types'
 
+export const dynamic = 'force-dynamic'
+
 export default async function ClientKanbanPage({
   params,
 }: {

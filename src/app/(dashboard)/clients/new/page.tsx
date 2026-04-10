@@ -1,6 +1,8 @@
 import { ClientForm } from '@/components/client-form'
 import { createClient } from '@/lib/actions/clients'
 
+export const dynamic = 'force-dynamic'
+
 export default function NewClientPage() {
   return (
     <div className="max-w-2xl mx-auto">

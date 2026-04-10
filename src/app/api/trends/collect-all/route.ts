@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     .from('clients')
     .select('niche')
 
-  const niches = [...new Set(clients?.map((c) => c.niche) ?? [])]
+  const niches = Array.from(new Set(clients?.map((c) => c.niche) ?? []))
 
   const results: { niche: string; count: number }[] = []
 

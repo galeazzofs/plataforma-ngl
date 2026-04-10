@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button'
 import { CalendarDays, TrendingUp, Trash2 } from 'lucide-react'
 import type { Client } from '@/types'
 
+export const dynamic = 'force-dynamic'
+
 export default async function ClientDetailPage({
   params,
 }: {
