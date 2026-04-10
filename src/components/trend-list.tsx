@@ -23,14 +23,19 @@ export function TrendList({ clientId, initialTrends }: TrendListProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ clientId }),
       })
-      const { data, error } = await res.json()
+      const result = await res.json()
 
-      if (error) {
-        toast.error('Erro ao coletar trends', { description: error })
+      if (result.error) {
+        toast.error('Erro ao coletar trends', { description: String(result.error) })
         return
       }
 
-      toast.success(`${data.length} trends coletados`)
+      const data = result.data ?? []
+      const debug = result.debug
+      const msg = debug
+        ? `Google: ${debug.googleCount}, YouTube: ${debug.youtubeCount}, Salvos: ${debug.insertedCount}`
+        : `${data.length} trends coletados`
+      toast.success(msg)
       setTrends((prev) => {
         const ids = new Set(prev.map((t) => t.id))
         const newOnes = (data as Trend[]).filter((t) => !ids.has(t.id))

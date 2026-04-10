@@ -40,19 +40,19 @@ export function CalendarGrid({ clientId, calendarId, initialItems, status }: Cal
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ clientId }),
       })
-      const { data, error } = await res.json()
+      const result = await res.json()
 
-      if (error) {
-        toast.error('Erro ao gerar calendario', { description: error })
+      if (result.error) {
+        toast.error('Erro ao gerar calendario', { description: String(result.error), duration: 10000 })
         return
       }
 
-      setItems(data.items)
-      setCurrentCalendarId(data.calendarId)
+      setItems(result.data.items)
+      setCurrentCalendarId(result.data.calendarId)
       setCurrentStatus('draft')
-      toast.success('Calendario gerado com sucesso!')
-    } catch {
-      toast.error('Erro ao gerar calendario')
+      toast.success(`Calendario gerado! ${result.data.items.length} videos criados`)
+    } catch (e: unknown) {
+      toast.error('Erro ao gerar calendario', { description: e instanceof Error ? e.message : 'Erro desconhecido' })
     } finally {
       setGenerating(false)
     }

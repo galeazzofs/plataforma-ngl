@@ -6,28 +6,29 @@ import { parseCalendarResponse } from '@/lib/ai/parse-calendar'
 import { randomUUID } from 'crypto'
 import type { Client, Trend } from '@/types'
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
-
 export async function POST(request: NextRequest) {
   try {
+    // 1. Auth check
     const supabase = await createServerSupabaseClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
-      return NextResponse.json({ data: null, error: 'Unauthorized' }, { status: 401 })
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (authError || !user) {
+      return NextResponse.json({ data: null, error: `Auth failed: ${authError?.message || 'No user'}` }, { status: 401 })
     }
 
     const { clientId } = await request.json()
 
-    const { data: client } = await supabase
+    // 2. Fetch client
+    const { data: client, error: clientError } = await supabase
       .from('clients')
       .select('*')
       .eq('id', clientId)
       .single()
 
-    if (!client) {
-      return NextResponse.json({ data: null, error: 'Client not found' }, { status: 404 })
+    if (clientError || !client) {
+      return NextResponse.json({ data: null, error: `Client fetch failed: ${clientError?.message || 'Not found'}` }, { status: 404 })
     }
 
+    // 3. Fetch trends
     const { data: trends } = await supabase
       .from('trends')
       .select('*')
@@ -36,6 +37,7 @@ export async function POST(request: NextRequest) {
       .order('collected_at', { ascending: false })
       .limit(30)
 
+    // 4. Calculate dates
     const today = new Date()
     const daysUntilMonday = (8 - today.getDay()) % 7 || 7
     const startDate = new Date(today)
@@ -46,39 +48,62 @@ export async function POST(request: NextRequest) {
     endDate.setDate(startDate.getDate() + 13)
     const endDateStr = endDate.toISOString().split('T')[0]
 
+    // 5. Build prompt
     const { system, user: userPrompt } = buildCalendarPrompt(
       client as Client,
       (trends ?? []) as Trend[],
       startDateStr
     )
 
+    // 6. Call Gemini
+    if (!process.env.GEMINI_API_KEY) {
+      return NextResponse.json({ data: null, error: 'GEMINI_API_KEY not configured' }, { status: 500 })
+    }
+
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
     const model = genAI.getGenerativeModel({
       model: 'gemini-2.0-flash',
       systemInstruction: system,
     })
 
-    const result = await model.generateContent(userPrompt)
-    const responseText = result.response.text()
+    let responseText: string
+    try {
+      const result = await model.generateContent(userPrompt)
+      responseText = result.response.text()
+    } catch (aiError: unknown) {
+      const msg = aiError instanceof Error ? aiError.message : String(aiError)
+      return NextResponse.json({ data: null, error: `Gemini API error: ${msg}` }, { status: 500 })
+    }
 
+    // 7. Parse response
     const calendarId = randomUUID()
-    let parseResult: ReturnType<typeof parseCalendarResponse> | null = null
+    let parseResult: ReturnType<typeof parseCalendarResponse>
 
     try {
       parseResult = parseCalendarResponse(responseText, calendarId, clientId, startDateStr)
     } catch {
-      console.warn('First parse failed, retrying with stricter prompt...')
-      const retryModel = genAI.getGenerativeModel({
-        model: 'gemini-2.0-flash',
-        systemInstruction: system + '\nIMPORTANTE: Responda APENAS com JSON valido. Sem markdown, sem texto extra, sem blocos de codigo.',
-      })
-      const retryResult = await retryModel.generateContent(userPrompt)
-      const retryText = retryResult.response.text()
-      parseResult = parseCalendarResponse(retryText, calendarId, clientId, startDateStr)
+      // Retry with stricter prompt
+      try {
+        const retryModel = genAI.getGenerativeModel({
+          model: 'gemini-2.0-flash',
+          systemInstruction: system + '\nIMPORTANTE: Responda APENAS com JSON valido. Sem markdown, sem texto extra, sem blocos de codigo.',
+        })
+        const retryResult = await retryModel.generateContent(userPrompt)
+        const retryText = retryResult.response.text()
+        parseResult = parseCalendarResponse(retryText, calendarId, clientId, startDateStr)
+      } catch (retryError: unknown) {
+        const msg = retryError instanceof Error ? retryError.message : String(retryError)
+        return NextResponse.json({
+          data: null,
+          error: `Failed to parse AI response: ${msg}`,
+          debug: responseText.substring(0, 500),
+        }, { status: 500 })
+      }
     }
 
     const { items, parsed: aiOutput } = parseResult
 
-    // Delete existing draft calendars for this client
+    // 8. Delete existing drafts
     const { data: existingDrafts } = await supabase
       .from('content_calendars')
       .select('id')
@@ -90,6 +115,7 @@ export async function POST(request: NextRequest) {
       await supabase.from('content_calendars').delete().eq('id', draft.id)
     }
 
+    // 9. Save calendar
     const { error: calError } = await supabase.from('content_calendars').insert({
       id: calendarId,
       client_id: clientId,
@@ -101,13 +127,14 @@ export async function POST(request: NextRequest) {
     })
 
     if (calError) {
-      return NextResponse.json({ data: null, error: calError.message }, { status: 500 })
+      return NextResponse.json({ data: null, error: `Calendar save failed: ${calError.message}` }, { status: 500 })
     }
 
+    // 10. Save items
     if (items.length > 0) {
       const { error: itemsError } = await supabase.from('content_items').insert(items)
       if (itemsError) {
-        console.error('Content items insert error:', itemsError)
+        return NextResponse.json({ data: null, error: `Items save failed: ${itemsError.message}` }, { status: 500 })
       }
     }
 
@@ -115,10 +142,10 @@ export async function POST(request: NextRequest) {
       data: { calendarId, items, period_start: startDateStr, period_end: endDateStr },
       error: null,
     })
-  } catch (error) {
-    console.error('Calendar generation error:', error)
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : String(error)
     return NextResponse.json(
-      { data: null, error: 'Failed to generate calendar' },
+      { data: null, error: `Unexpected error: ${msg}` },
       { status: 500 }
     )
   }
