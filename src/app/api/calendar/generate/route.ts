@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
     const model = genAI.getGenerativeModel({
-      model: 'gemini-2.0-flash',
+      model: 'gemini-1.5-flash',
       systemInstruction: system,
     })
 
@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
       // Retry with stricter prompt
       try {
         const retryModel = genAI.getGenerativeModel({
-          model: 'gemini-2.0-flash',
+          model: 'gemini-1.5-flash',
           systemInstruction: system + '\nIMPORTANTE: Responda APENAS com JSON valido. Sem markdown, sem texto extra, sem blocos de codigo.',
         })
         const retryResult = await retryModel.generateContent(userPrompt)
