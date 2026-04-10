@@ -45,17 +45,17 @@ function DroppableColumn({
     <div
       ref={setNodeRef}
       className={cn(
-        'flex flex-col w-72 flex-shrink-0 bg-secondary/30 rounded-xl transition-colors duration-150',
-        isOver && 'bg-indigo-500/5 border border-indigo-500/20'
+        'flex flex-col min-w-[280px] w-[280px] flex-shrink-0 bg-white/[0.02] rounded-2xl transition-all duration-200',
+        isOver && 'bg-violet-500/[0.04] ring-1 ring-violet-500/20'
       )}
     >
       <div className="flex items-center justify-between px-4 py-3">
-        <h3 className="text-sm font-medium text-muted-foreground">{label}</h3>
-        <span className="text-xs text-muted-foreground bg-secondary rounded-full px-2 py-0.5">
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-white/30">{label}</h3>
+        <span className="bg-white/[0.06] rounded-full px-2.5 py-0.5 text-[11px] text-white/40">
           {items.length}
         </span>
       </div>
-      <div className="flex-1 px-2 pb-2 space-y-2 overflow-y-auto min-h-[200px]">
+      <div className="flex-1 px-2 pb-3 space-y-2.5 overflow-y-auto min-h-[200px]">
         {children}
       </div>
     </div>
@@ -176,12 +176,12 @@ export function KanbanBoard({ initialItems, clientFilter }: KanbanBoardProps) {
       onDragEnd={handleDragEnd}
     >
       {connectionStatus === 'reconnecting' && (
-        <div className="mb-4 px-4 py-3 bg-amber-500/10 border border-amber-500/20 rounded-xl text-sm text-amber-400 flex items-center gap-2">
+        <div className="mb-4 bg-amber-500/[0.08] border border-amber-500/20 rounded-2xl px-4 py-3 text-amber-300 text-sm flex items-center gap-2">
           <div className="h-2 w-2 rounded-full bg-amber-400 animate-pulse" />
           Reconectando... Atualizando a cada 30s
         </div>
       )}
-      <div className="flex gap-4 overflow-x-auto pb-4">
+      <div className="flex gap-5 overflow-x-auto pb-4">
         {KANBAN_COLUMNS.map((col) => {
           const colItems = getColumnItems(col.key)
           return (

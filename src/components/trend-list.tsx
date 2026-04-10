@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { Button } from '@/components/ui/button'
 import { RefreshCw, ExternalLink } from 'lucide-react'
 import { toast } from 'sonner'
 import type { Trend } from '@/types'
@@ -47,64 +46,63 @@ export function TrendList({ clientId, initialTrends }: TrendListProps) {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <p className="text-sm text-muted-foreground">{trends.length} trends coletados</p>
-        <Button
+        <p className="text-sm text-white/40">{trends.length} trends coletados</p>
+        <button
           onClick={collectTrends}
           disabled={loading}
-          size="sm"
-          className="bg-indigo-600 hover:bg-indigo-500 text-white transition-colors duration-150"
+          className="bg-gradient-to-r from-violet-600 to-cyan-600 text-white rounded-xl font-medium hover:from-violet-500 hover:to-cyan-500 px-4 py-2 text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
         >
-          <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
           {loading ? 'Coletando...' : 'Coletar Agora'}
-        </Button>
+        </button>
       </div>
 
       {!trends.length ? (
-        <div className="bg-card border border-border/50 rounded-xl flex flex-col items-center justify-center py-12">
-          <p className="text-muted-foreground mb-4">Nenhuma trend coletada para este nicho</p>
-          <Button
+        <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl flex flex-col items-center justify-center py-12">
+          <p className="text-white/40 mb-4">Nenhuma trend coletada para este nicho</p>
+          <button
             onClick={collectTrends}
             disabled={loading}
-            className="bg-indigo-600 hover:bg-indigo-500 text-white transition-colors duration-150"
+            className="bg-gradient-to-r from-violet-600 to-cyan-600 text-white rounded-xl font-medium hover:from-violet-500 hover:to-cyan-500 px-5 py-2.5 text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Coletar Trends
-          </Button>
+          </button>
         </div>
       ) : (
         <div className="space-y-2">
           {trends.map((trend) => (
             <div
               key={trend.id}
-              className="bg-card border border-border/50 rounded-xl hover:border-border transition-colors duration-150 px-4 py-3"
+              className="bg-white/[0.03] border border-white/[0.06] rounded-2xl px-5 py-3.5 hover:border-white/[0.12] transition-all duration-200"
             >
               <div className="flex items-center justify-between">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-medium text-foreground text-sm">{trend.title}</span>
+                    <span className="font-medium text-white/90 text-sm">{trend.title}</span>
                     <span
                       className={
                         trend.source === 'google_trends'
-                          ? 'bg-blue-500/10 text-blue-400 text-xs px-2 py-0.5 rounded-full'
-                          : 'bg-red-500/10 text-red-400 text-xs px-2 py-0.5 rounded-full'
+                          ? 'bg-cyan-500/10 text-cyan-300 text-xs px-2.5 py-0.5 rounded-full font-medium'
+                          : 'bg-rose-500/10 text-rose-300 text-xs px-2.5 py-0.5 rounded-full font-medium'
                       }
                     >
                       {trend.source === 'google_trends' ? 'Google' : 'YouTube'}
                     </span>
                     {trend.relevance_score && (
-                      <span className="bg-secondary text-muted-foreground text-xs px-2 py-0.5 rounded-full">
+                      <span className="bg-white/[0.06] text-white/40 text-xs px-2.5 py-0.5 rounded-full">
                         {trend.relevance_score}
                       </span>
                     )}
                   </div>
                   {trend.description && (
-                    <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{trend.description}</p>
+                    <p className="text-xs text-white/30 mt-1 line-clamp-1">{trend.description}</p>
                   )}
                 </div>
                 <div className="flex items-center gap-3 ml-4 flex-shrink-0">
-                  <span className="text-xs text-muted-foreground/60">{formatDate(trend.collected_at)}</span>
+                  <span className="text-[11px] text-white/25">{formatDate(trend.collected_at)}</span>
                   {trend.url && (
                     <a href={trend.url} target="_blank" rel="noopener noreferrer">
-                      <ExternalLink className="h-4 w-4 text-muted-foreground/50 hover:text-foreground transition-colors duration-150" />
+                      <ExternalLink className="h-4 w-4 text-white/20 hover:text-white/60 transition-colors duration-200" />
                     </a>
                   )}
                 </div>

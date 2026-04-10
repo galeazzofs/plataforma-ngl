@@ -1,4 +1,3 @@
-import { Badge } from '@/components/ui/badge'
 import { AlertTriangle, Video, CheckCircle, Clock } from 'lucide-react'
 import Link from 'next/link'
 import type { ContentItem, Client, KanbanStatus } from '@/types'
@@ -23,83 +22,65 @@ export function DashboardStats({ clients, items }: DashboardStatsProps) {
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 md:grid-cols-4">
-        <div className="bg-card border border-border/50 rounded-xl p-5">
-          <div className="flex items-center gap-4">
-            <div className="bg-indigo-500/10 rounded-xl p-2.5">
-              <Video className="h-5 w-5 text-indigo-400" />
-            </div>
-            <div>
-              <p className="text-3xl font-bold text-foreground">{items.length}</p>
-              <p className="text-sm text-muted-foreground">Total de videos</p>
-            </div>
+      <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+        <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-6 animate-fade-up">
+          <div className="h-12 w-12 rounded-2xl flex items-center justify-center bg-violet-500/10">
+            <Video className="h-5 w-5 text-violet-400" />
           </div>
+          <p className="text-3xl font-extrabold text-white/95 mt-4">{items.length}</p>
+          <p className="text-sm text-white/40 mt-1">Total de videos</p>
         </div>
 
-        <div className="bg-card border border-border/50 rounded-xl p-5">
-          <div className="flex items-center gap-4">
-            <div className="bg-amber-500/10 rounded-xl p-2.5">
-              <Clock className="h-5 w-5 text-amber-400" />
-            </div>
-            <div>
-              <p className="text-3xl font-bold text-foreground">
-                {statusCounts.to_record + statusCounts.editing}
-              </p>
-              <p className="text-sm text-muted-foreground">Em producao</p>
-            </div>
+        <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-6 animate-fade-up stagger-1">
+          <div className="h-12 w-12 rounded-2xl flex items-center justify-center bg-amber-500/10">
+            <Clock className="h-5 w-5 text-amber-400" />
           </div>
+          <p className="text-3xl font-extrabold text-white/95 mt-4">
+            {statusCounts.to_record + statusCounts.editing}
+          </p>
+          <p className="text-sm text-white/40 mt-1">Em producao</p>
         </div>
 
-        <div className="bg-card border border-border/50 rounded-xl p-5">
-          <div className="flex items-center gap-4">
-            <div className="bg-emerald-500/10 rounded-xl p-2.5">
-              <CheckCircle className="h-5 w-5 text-emerald-400" />
-            </div>
-            <div>
-              <p className="text-3xl font-bold text-foreground">{statusCounts.published}</p>
-              <p className="text-sm text-muted-foreground">Publicados</p>
-            </div>
+        <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-6 animate-fade-up stagger-2">
+          <div className="h-12 w-12 rounded-2xl flex items-center justify-center bg-emerald-500/10">
+            <CheckCircle className="h-5 w-5 text-emerald-400" />
           </div>
+          <p className="text-3xl font-extrabold text-white/95 mt-4">{statusCounts.published}</p>
+          <p className="text-sm text-white/40 mt-1">Publicados</p>
         </div>
 
-        <div className="bg-card border border-border/50 rounded-xl p-5">
-          <div className="flex items-center gap-4">
-            <div className="bg-red-500/10 rounded-xl p-2.5">
-              <AlertTriangle className="h-5 w-5 text-red-400" />
-            </div>
-            <div>
-              <p className="text-3xl font-bold text-foreground">{overdueItems.length}</p>
-              <p className="text-sm text-muted-foreground">Atrasados</p>
-            </div>
+        <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-6 animate-fade-up stagger-3">
+          <div className="h-12 w-12 rounded-2xl flex items-center justify-center bg-rose-500/10">
+            <AlertTriangle className="h-5 w-5 text-rose-400" />
           </div>
+          <p className="text-3xl font-extrabold text-white/95 mt-4">{overdueItems.length}</p>
+          <p className="text-sm text-white/40 mt-1">Atrasados</p>
         </div>
       </div>
 
       {overdueItems.length > 0 && (
-        <div className="bg-card border border-red-500/20 rounded-xl overflow-hidden">
-          <div className="px-5 py-4 border-b border-border/50">
-            <h3 className="text-base font-semibold text-foreground flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-red-400" />
-              Videos Atrasados
-            </h3>
+        <div className="bg-white/[0.03] border border-rose-500/20 rounded-2xl overflow-hidden">
+          <div className="px-6 py-4 flex items-center gap-2">
+            <AlertTriangle className="h-5 w-5 text-rose-400" />
+            <h3 className="text-white/90 font-semibold">Videos Atrasados</h3>
           </div>
-          <div className="p-5 space-y-1">
+          <div className="px-3 pb-3 space-y-0.5">
             {overdueItems.slice(0, 10).map((item) => {
               const client = clients.find((c) => c.id === item.client_id)
               return (
                 <div
                   key={item.id}
-                  className="flex items-center justify-between py-2.5 px-3 rounded-lg hover:bg-secondary/50 transition-colors duration-150"
+                  className="flex items-center justify-between hover:bg-white/[0.03] rounded-xl px-4 py-3 transition-all duration-200"
                 >
                   <div>
-                    <p className="text-sm font-medium text-foreground">{item.title}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">
+                    <p className="text-sm font-medium text-white/90">{item.title}</p>
+                    <p className="text-xs text-white/30 mt-0.5">
                       {client?.name} — Data: {formatDate(item.scheduled_date)}
                     </p>
                   </div>
-                  <Badge variant="outline" className="border-red-500/30 text-red-400 text-xs">
+                  <span className="bg-rose-500/10 text-rose-300 rounded-full px-3 py-1 text-xs font-medium">
                     {KANBAN_COLUMNS.find((c) => c.key === item.kanban_status)?.label}
-                  </Badge>
+                  </span>
                 </div>
               )
             })}
@@ -107,11 +88,11 @@ export function DashboardStats({ clients, items }: DashboardStatsProps) {
         </div>
       )}
 
-      <div className="bg-card border border-border/50 rounded-xl overflow-hidden">
-        <div className="px-5 py-4 border-b border-border/50">
-          <h3 className="text-base font-semibold text-foreground">Clientes</h3>
+      <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl overflow-hidden">
+        <div className="px-6 py-4 border-b border-white/[0.06]">
+          <h3 className="text-base font-semibold text-white/90">Clientes</h3>
         </div>
-        <div className="p-5 space-y-1">
+        <div className="px-3 pb-3 pt-1 space-y-0.5">
           {clients.map((client) => {
             const clientItems = items.filter((i) => i.client_id === client.id)
             const clientOverdue = clientItems.filter((i) =>
@@ -121,20 +102,20 @@ export function DashboardStats({ clients, items }: DashboardStatsProps) {
               <Link
                 key={client.id}
                 href={`/kanban/${client.id}`}
-                className="flex items-center justify-between py-2.5 px-3 rounded-lg hover:bg-secondary/50 transition-colors duration-150"
+                className="flex items-center justify-between hover:bg-white/[0.03] rounded-xl px-4 py-3 transition-all duration-200"
               >
                 <div>
-                  <p className="font-medium text-foreground">{client.name}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">{client.niche}</p>
+                  <p className="font-semibold text-white/90">{client.name}</p>
+                  <p className="text-xs text-white/30 mt-0.5">{client.niche}</p>
                 </div>
                 <div className="flex gap-2">
-                  <Badge variant="outline" className="border-border/50 text-muted-foreground text-xs">
+                  <span className="bg-white/[0.06] text-white/40 rounded-full px-3 py-1 text-xs font-medium">
                     {clientItems.length} videos
-                  </Badge>
+                  </span>
                   {clientOverdue > 0 && (
-                    <Badge variant="outline" className="border-red-500/30 text-red-400 text-xs">
+                    <span className="bg-rose-500/10 text-rose-300 rounded-full px-3 py-1 text-xs font-medium">
                       {clientOverdue} atrasados
-                    </Badge>
+                    </span>
                   )}
                 </div>
               </Link>

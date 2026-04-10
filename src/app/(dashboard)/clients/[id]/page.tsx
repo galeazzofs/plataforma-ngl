@@ -30,19 +30,19 @@ export default async function ClientDetailPage({
   return (
     <div>
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-semibold text-foreground">{typedClient.name}</h1>
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-2xl font-bold text-white/90">{typedClient.name}</h1>
         <div className="flex items-center gap-2">
           <Link
             href={`/clients/${id}/trends`}
-            className="inline-flex items-center gap-2 border border-border/50 hover:bg-secondary/50 text-muted-foreground hover:text-foreground text-sm font-medium rounded-lg px-3.5 py-2 transition-all duration-150"
+            className="inline-flex items-center gap-2 bg-white/[0.03] border border-white/[0.08] text-white/60 hover:text-white/90 hover:bg-white/[0.06] rounded-xl text-sm font-medium px-4 py-2.5 transition-all duration-200"
           >
             <TrendingUp className="h-4 w-4" />
             Trends
           </Link>
           <Link
             href={`/clients/${id}/calendar`}
-            className="inline-flex items-center gap-2 border border-border/50 hover:bg-secondary/50 text-muted-foreground hover:text-foreground text-sm font-medium rounded-lg px-3.5 py-2 transition-all duration-150"
+            className="inline-flex items-center gap-2 bg-white/[0.03] border border-white/[0.08] text-white/60 hover:text-white/90 hover:bg-white/[0.06] rounded-xl text-sm font-medium px-4 py-2.5 transition-all duration-200"
           >
             <CalendarDays className="h-4 w-4" />
             Calendario
@@ -50,7 +50,7 @@ export default async function ClientDetailPage({
           <form action={deleteWithId}>
             <button
               type="submit"
-              className="inline-flex items-center justify-center bg-destructive/10 hover:bg-destructive/20 text-destructive rounded-lg p-2 transition-colors duration-150"
+              className="inline-flex items-center justify-center bg-rose-500/10 border border-rose-500/20 text-rose-400 hover:bg-rose-500/20 rounded-xl p-2.5 transition-all duration-200"
             >
               <Trash2 className="h-4 w-4" />
             </button>
