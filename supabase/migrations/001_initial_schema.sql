@@ -80,8 +80,8 @@ CREATE POLICY "Authenticated users full access" ON trends
 -- Index for niche + date queries
 CREATE INDEX idx_trends_niche_collected ON trends(niche, collected_at DESC);
 
--- Unique constraint for deduplication
-CREATE UNIQUE INDEX idx_trends_unique ON trends(niche, source, title, (collected_at::date));
+-- Deduplicate by niche + source + title (one entry per trend, regardless of date)
+CREATE UNIQUE INDEX idx_trends_unique ON trends(niche, source, title);
 
 -- ============================================
 -- CONTENT CALENDARS

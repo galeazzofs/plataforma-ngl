@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
-import Anthropic from '@anthropic-ai/sdk'
+import { GoogleGenerativeAI } from '@google/generative-ai'
 import { buildCalendarPrompt } from '@/lib/ai/prompt'
 import { parseCalendarResponse } from '@/lib/ai/parse-calendar'
 import { randomUUID } from 'crypto'
 import type { Client, Trend } from '@/types'
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
 
 export async function POST(request: NextRequest) {
   try {
@@ -52,14 +52,13 @@ export async function POST(request: NextRequest) {
       startDateStr
     )
 
-    const message = await anthropic.messages.create({
-      model: 'claude-sonnet-4-5-20250514',
-      max_tokens: 8000,
-      system,
-      messages: [{ role: 'user', content: userPrompt }],
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-2.0-flash',
+      systemInstruction: system,
     })
 
-    const responseText = message.content[0].type === 'text' ? message.content[0].text : ''
+    const result = await model.generateContent(userPrompt)
+    const responseText = result.response.text()
 
     const calendarId = randomUUID()
     let parseResult: ReturnType<typeof parseCalendarResponse> | null = null
@@ -68,13 +67,12 @@ export async function POST(request: NextRequest) {
       parseResult = parseCalendarResponse(responseText, calendarId, clientId, startDateStr)
     } catch {
       console.warn('First parse failed, retrying with stricter prompt...')
-      const retryMessage = await anthropic.messages.create({
-        model: 'claude-sonnet-4-5-20250514',
-        max_tokens: 8000,
-        system: system + '\nIMPORTANTE: Responda APENAS com JSON valido. Sem markdown, sem texto extra, sem blocos de codigo.',
-        messages: [{ role: 'user', content: userPrompt }],
+      const retryModel = genAI.getGenerativeModel({
+        model: 'gemini-2.0-flash',
+        systemInstruction: system + '\nIMPORTANTE: Responda APENAS com JSON valido. Sem markdown, sem texto extra, sem blocos de codigo.',
       })
-      const retryText = retryMessage.content[0].type === 'text' ? retryMessage.content[0].text : ''
+      const retryResult = await retryModel.generateContent(userPrompt)
+      const retryText = retryResult.response.text()
       parseResult = parseCalendarResponse(retryText, calendarId, clientId, startDateStr)
     }
 
