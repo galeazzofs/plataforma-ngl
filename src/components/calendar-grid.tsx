@@ -2,8 +2,6 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Sparkles, Check, Trash2, Pencil } from 'lucide-react'
@@ -11,7 +9,7 @@ import { toast } from 'sonner'
 import { commitCalendar } from '@/lib/actions/calendar'
 import { updateContentItem, deleteContentItem } from '@/lib/actions/content-items'
 import type { ContentItem } from '@/types'
-import { formatDateShort } from '@/lib/utils'
+import { formatDateShort, cn } from '@/lib/utils'
 
 interface CalendarGridProps {
   clientId: string
@@ -22,9 +20,9 @@ interface CalendarGridProps {
 
 const effortLabels: Record<number, string> = { 1: 'Simples', 2: 'Medio', 3: 'Complexo' }
 const effortColors: Record<number, string> = {
-  1: 'bg-emerald-100 text-emerald-700',
-  2: 'bg-amber-100 text-amber-700',
-  3: 'bg-red-100 text-red-700',
+  1: 'bg-emerald-500/10 text-emerald-400',
+  2: 'bg-amber-500/10 text-amber-400',
+  3: 'bg-red-500/10 text-red-400',
 }
 
 export function CalendarGrid({ clientId, calendarId, initialItems, status }: CalendarGridProps) {
@@ -101,50 +99,58 @@ export function CalendarGrid({ clientId, calendarId, initialItems, status }: Cal
   return (
     <div>
       <div className="flex items-center gap-3 mb-6">
-        <Button onClick={generateCalendar} disabled={generating}>
+        <Button
+          onClick={generateCalendar}
+          disabled={generating}
+          className="bg-indigo-600 hover:bg-indigo-500 text-white transition-colors duration-150"
+        >
           <Sparkles className={`h-4 w-4 mr-2 ${generating ? 'animate-pulse' : ''}`} />
           {generating ? 'Gerando...' : items.length ? 'Regenerar Calendario' : 'Gerar Calendario'}
         </Button>
 
         {currentStatus === 'draft' && items.length > 0 && (
-          <Button variant="outline" onClick={handleCommit}>
+          <Button
+            variant="outline"
+            onClick={handleCommit}
+            className="border-emerald-500/50 text-emerald-400 hover:bg-emerald-500/10 transition-colors duration-150"
+          >
             <Check className="h-4 w-4 mr-2" />
             Enviar para Kanban
           </Button>
         )}
 
         {currentStatus === 'committed' && (
-          <Badge className="bg-emerald-100 text-emerald-700">Enviado ao Kanban</Badge>
+          <span className="bg-emerald-500/10 text-emerald-400 rounded-full text-sm px-3 py-1 font-medium">
+            Enviado ao Kanban
+          </span>
         )}
       </div>
 
       {items.length === 0 ? (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <p className="text-slate-500 mb-4">Nenhum calendario gerado ainda</p>
-            <p className="text-sm text-slate-400">Clique em &quot;Gerar Calendario&quot; para comecar</p>
-          </CardContent>
-        </Card>
+        <div className="bg-card border border-border/50 rounded-xl flex flex-col items-center justify-center py-12">
+          <p className="text-muted-foreground mb-2">Nenhum calendario gerado ainda</p>
+          <p className="text-sm text-muted-foreground/60">Clique em &quot;Gerar Calendario&quot; para comecar</p>
+        </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {Array.from({ length: 14 }, (_, i) => i + 1).map((dayNum) => {
             const dayItems = dayGroups[dayNum] ?? []
             const firstItem = dayItems[0]
             return (
-              <Card key={dayNum} className="overflow-hidden">
-                <CardHeader className="py-3 px-4 bg-slate-50">
-                  <CardTitle className="text-sm font-medium text-slate-700">
+              <div key={dayNum} className="bg-card border border-border/50 rounded-xl overflow-hidden">
+                <div className="bg-secondary/50 px-4 py-2.5">
+                  <p className="text-sm font-medium text-muted-foreground">
                     Dia {dayNum} — {firstItem ? formatDateShort(firstItem.scheduled_date) : ''}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-3 space-y-2">
+                  </p>
+                </div>
+                <div className="p-3 space-y-2">
                   {dayItems.length === 0 ? (
-                    <p className="text-xs text-slate-400 py-2">Sem videos</p>
+                    <p className="text-xs text-muted-foreground/50 py-2">Sem videos</p>
                   ) : (
                     dayItems.map((item) => (
                       <div
                         key={item.id}
-                        className="border border-slate-200 rounded-lg p-3 space-y-2"
+                        className="bg-secondary/30 rounded-lg p-3 space-y-2 border border-border/30"
                       >
                         {editingId === item.id ? (
                           <EditForm
@@ -155,42 +161,40 @@ export function CalendarGrid({ clientId, calendarId, initialItems, status }: Cal
                         ) : (
                           <>
                             <div className="flex items-start justify-between">
-                              <p className="font-medium text-sm text-slate-900">{item.title}</p>
+                              <p className="font-medium text-sm text-foreground">{item.title}</p>
                               {currentStatus === 'draft' && (
                                 <div className="flex gap-1">
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-6 w-6"
+                                  <button
+                                    className="p-1 rounded text-muted-foreground/50 hover:text-foreground transition-colors duration-150"
                                     onClick={() => setEditingId(item.id)}
                                   >
-                                    <Pencil className="h-3 w-3" />
-                                  </Button>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-6 w-6 text-red-500"
+                                    <Pencil className="h-3.5 w-3.5" />
+                                  </button>
+                                  <button
+                                    className="p-1 rounded text-muted-foreground/50 hover:text-red-400 transition-colors duration-150"
                                     onClick={() => handleDelete(item.id)}
                                   >
-                                    <Trash2 className="h-3 w-3" />
-                                  </Button>
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                  </button>
                                 </div>
                               )}
                             </div>
-                            <p className="text-xs text-slate-500">{item.concept}</p>
-                            <div className="flex gap-1">
-                              <Badge variant="outline" className="text-xs">{item.format}</Badge>
-                              <Badge className={`text-xs ${effortColors[item.effort]}`}>
+                            <p className="text-xs text-muted-foreground">{item.concept}</p>
+                            <div className="flex gap-1.5">
+                              <span className="bg-secondary text-muted-foreground rounded-full text-xs px-2 py-0.5">
+                                {item.format}
+                              </span>
+                              <span className={cn('rounded-full text-xs px-2 py-0.5 font-medium', effortColors[item.effort])}>
                                 {effortLabels[item.effort]}
-                              </Badge>
+                              </span>
                             </div>
                           </>
                         )}
                       </div>
                     ))
                   )}
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             )
           })}
         </div>
@@ -214,12 +218,39 @@ function EditForm({
 
   return (
     <div className="space-y-2">
-      <Input value={title} onChange={(e) => setTitle(e.target.value)} className="text-sm" />
-      <Textarea value={concept} onChange={(e) => setConcept(e.target.value)} rows={2} className="text-sm" />
-      <Input value={hook} onChange={(e) => setHook(e.target.value)} placeholder="Hook" className="text-sm" />
+      <Input
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        className="text-sm bg-secondary/50 border-border/50 rounded-lg"
+      />
+      <Textarea
+        value={concept}
+        onChange={(e) => setConcept(e.target.value)}
+        rows={2}
+        className="text-sm bg-secondary/50 border-border/50 rounded-lg"
+      />
+      <Input
+        value={hook}
+        onChange={(e) => setHook(e.target.value)}
+        placeholder="Hook"
+        className="text-sm bg-secondary/50 border-border/50 rounded-lg"
+      />
       <div className="flex gap-2">
-        <Button size="sm" onClick={() => onSave({ title, concept, hook })}>Salvar</Button>
-        <Button size="sm" variant="ghost" onClick={onCancel}>Cancelar</Button>
+        <Button
+          size="sm"
+          onClick={() => onSave({ title, concept, hook })}
+          className="bg-indigo-600 hover:bg-indigo-500 text-white text-xs"
+        >
+          Salvar
+        </Button>
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={onCancel}
+          className="text-muted-foreground text-xs"
+        >
+          Cancelar
+        </Button>
       </div>
     </div>
   )

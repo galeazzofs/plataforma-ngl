@@ -45,17 +45,17 @@ function DroppableColumn({
     <div
       ref={setNodeRef}
       className={cn(
-        'flex flex-col w-72 flex-shrink-0 bg-slate-100 rounded-lg',
-        isOver && 'bg-indigo-50'
+        'flex flex-col w-72 flex-shrink-0 bg-secondary/30 rounded-xl transition-colors duration-150',
+        isOver && 'bg-indigo-500/5 border border-indigo-500/20'
       )}
     >
-      <div className="flex items-center justify-between px-3 py-2 border-b border-slate-200">
-        <h3 className="font-medium text-sm text-slate-700">{label}</h3>
-        <span className="text-xs text-slate-400 bg-white px-2 py-0.5 rounded-full">
+      <div className="flex items-center justify-between px-4 py-3">
+        <h3 className="text-sm font-medium text-muted-foreground">{label}</h3>
+        <span className="text-xs text-muted-foreground bg-secondary rounded-full px-2 py-0.5">
           {items.length}
         </span>
       </div>
-      <div className="flex-1 p-2 space-y-2 overflow-y-auto min-h-[200px]">
+      <div className="flex-1 px-2 pb-2 space-y-2 overflow-y-auto min-h-[200px]">
         {children}
       </div>
     </div>
@@ -176,7 +176,8 @@ export function KanbanBoard({ initialItems, clientFilter }: KanbanBoardProps) {
       onDragEnd={handleDragEnd}
     >
       {connectionStatus === 'reconnecting' && (
-        <div className="mb-4 px-3 py-2 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-700">
+        <div className="mb-4 px-4 py-3 bg-amber-500/10 border border-amber-500/20 rounded-xl text-sm text-amber-400 flex items-center gap-2">
+          <div className="h-2 w-2 rounded-full bg-amber-400 animate-pulse" />
           Reconectando... Atualizando a cada 30s
         </div>
       )}

@@ -2,8 +2,6 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { RefreshCw, ExternalLink } from 'lucide-react'
 import { toast } from 'sonner'
 import type { Trend } from '@/types'
@@ -46,59 +44,72 @@ export function TrendList({ clientId, initialTrends }: TrendListProps) {
     }
   }
 
-  const sourceColors: Record<string, string> = {
-    google_trends: 'bg-blue-100 text-blue-700',
-    youtube: 'bg-red-100 text-red-700',
-  }
-
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <p className="text-sm text-slate-500">{trends.length} trends coletados</p>
-        <Button onClick={collectTrends} disabled={loading} size="sm">
+        <p className="text-sm text-muted-foreground">{trends.length} trends coletados</p>
+        <Button
+          onClick={collectTrends}
+          disabled={loading}
+          size="sm"
+          className="bg-indigo-600 hover:bg-indigo-500 text-white transition-colors duration-150"
+        >
           <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
           {loading ? 'Coletando...' : 'Coletar Agora'}
         </Button>
       </div>
 
       {!trends.length ? (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <p className="text-slate-500 mb-4">Nenhuma trend coletada para este nicho</p>
-            <Button onClick={collectTrends} disabled={loading}>
-              Coletar Trends
-            </Button>
-          </CardContent>
-        </Card>
+        <div className="bg-card border border-border/50 rounded-xl flex flex-col items-center justify-center py-12">
+          <p className="text-muted-foreground mb-4">Nenhuma trend coletada para este nicho</p>
+          <Button
+            onClick={collectTrends}
+            disabled={loading}
+            className="bg-indigo-600 hover:bg-indigo-500 text-white transition-colors duration-150"
+          >
+            Coletar Trends
+          </Button>
+        </div>
       ) : (
         <div className="space-y-2">
           {trends.map((trend) => (
-            <Card key={trend.id}>
-              <CardContent className="flex items-center justify-between py-3">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium text-slate-900">{trend.title}</span>
-                    <Badge className={sourceColors[trend.source] ?? ''} variant="secondary">
+            <div
+              key={trend.id}
+              className="bg-card border border-border/50 rounded-xl hover:border-border transition-colors duration-150 px-4 py-3"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-medium text-foreground text-sm">{trend.title}</span>
+                    <span
+                      className={
+                        trend.source === 'google_trends'
+                          ? 'bg-blue-500/10 text-blue-400 text-xs px-2 py-0.5 rounded-full'
+                          : 'bg-red-500/10 text-red-400 text-xs px-2 py-0.5 rounded-full'
+                      }
+                    >
                       {trend.source === 'google_trends' ? 'Google' : 'YouTube'}
-                    </Badge>
+                    </span>
                     {trend.relevance_score && (
-                      <Badge variant="outline">{trend.relevance_score}</Badge>
+                      <span className="bg-secondary text-muted-foreground text-xs px-2 py-0.5 rounded-full">
+                        {trend.relevance_score}
+                      </span>
                     )}
                   </div>
                   {trend.description && (
-                    <p className="text-sm text-slate-500 mt-1 line-clamp-1">{trend.description}</p>
+                    <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{trend.description}</p>
                   )}
                 </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-xs text-slate-400">{formatDate(trend.collected_at)}</span>
+                <div className="flex items-center gap-3 ml-4 flex-shrink-0">
+                  <span className="text-xs text-muted-foreground/60">{formatDate(trend.collected_at)}</span>
                   {trend.url && (
                     <a href={trend.url} target="_blank" rel="noopener noreferrer">
-                      <ExternalLink className="h-4 w-4 text-slate-400 hover:text-slate-600" />
+                      <ExternalLink className="h-4 w-4 text-muted-foreground/50 hover:text-foreground transition-colors duration-150" />
                     </a>
                   )}
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           ))}
         </div>
       )}

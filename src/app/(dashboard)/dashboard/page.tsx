@@ -15,8 +15,8 @@ export default async function DashboardPage() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
-        <p className="text-slate-500 mt-1">Visao geral da producao</p>
+        <h1 className="text-2xl font-semibold text-foreground">Dashboard</h1>
+        <p className="text-muted-foreground mt-1">Visao geral da producao</p>
       </div>
       <DashboardStats
         clients={(clients ?? []) as Client[]}

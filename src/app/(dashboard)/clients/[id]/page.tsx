@@ -3,7 +3,6 @@ import Link from 'next/link'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { ClientForm } from '@/components/client-form'
 import { updateClient, deleteClient } from '@/lib/actions/clients'
-import { Button } from '@/components/ui/button'
 import { CalendarDays, TrendingUp, Trash2 } from 'lucide-react'
 import type { Client } from '@/types'
 
@@ -30,29 +29,36 @@ export default async function ClientDetailPage({
 
   return (
     <div>
+      {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-slate-900">{typedClient.name}</h1>
-        <div className="flex gap-2">
-          <Button variant="outline" asChild>
-            <Link href={`/clients/${id}/trends`}>
-              <TrendingUp className="h-4 w-4 mr-2" />
-              Trends
-            </Link>
-          </Button>
-          <Button variant="outline" asChild>
-            <Link href={`/clients/${id}/calendar`}>
-              <CalendarDays className="h-4 w-4 mr-2" />
-              Calendario
-            </Link>
-          </Button>
+        <h1 className="text-2xl font-semibold text-foreground">{typedClient.name}</h1>
+        <div className="flex items-center gap-2">
+          <Link
+            href={`/clients/${id}/trends`}
+            className="inline-flex items-center gap-2 border border-border/50 hover:bg-secondary/50 text-muted-foreground hover:text-foreground text-sm font-medium rounded-lg px-3.5 py-2 transition-all duration-150"
+          >
+            <TrendingUp className="h-4 w-4" />
+            Trends
+          </Link>
+          <Link
+            href={`/clients/${id}/calendar`}
+            className="inline-flex items-center gap-2 border border-border/50 hover:bg-secondary/50 text-muted-foreground hover:text-foreground text-sm font-medium rounded-lg px-3.5 py-2 transition-all duration-150"
+          >
+            <CalendarDays className="h-4 w-4" />
+            Calendario
+          </Link>
           <form action={deleteWithId}>
-            <Button variant="destructive" size="icon" type="submit">
+            <button
+              type="submit"
+              className="inline-flex items-center justify-center bg-destructive/10 hover:bg-destructive/20 text-destructive rounded-lg p-2 transition-colors duration-150"
+            >
               <Trash2 className="h-4 w-4" />
-            </Button>
+            </button>
           </form>
         </div>
       </div>
 
+      {/* Form */}
       <div className="max-w-2xl">
         <ClientForm action={updateWithId} client={typedClient} />
       </div>

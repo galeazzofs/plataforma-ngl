@@ -1,7 +1,5 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { Card, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import type { ContentItem } from '@/types'
 import { formatDateShort, isOverdue, cn } from '@/lib/utils'
 import { AlertTriangle } from 'lucide-react'
@@ -11,9 +9,9 @@ interface KanbanCardProps {
 }
 
 const effortColors: Record<number, string> = {
-  1: 'bg-emerald-100 text-emerald-700',
-  2: 'bg-amber-100 text-amber-700',
-  3: 'bg-red-100 text-red-700',
+  1: 'bg-emerald-500/10 text-emerald-400',
+  2: 'bg-amber-500/10 text-amber-400',
+  3: 'bg-red-500/10 text-red-400',
 }
 
 export function KanbanCard({ item }: KanbanCardProps) {
@@ -34,31 +32,39 @@ export function KanbanCard({ item }: KanbanCardProps) {
   const overdue = isOverdue(item.scheduled_date, item.kanban_status)
 
   return (
-    <Card
+    <div
       ref={setNodeRef}
       style={style}
       {...attributes}
       {...listeners}
       className={cn(
-        'cursor-grab active:cursor-grabbing',
+        'bg-card border border-border/50 rounded-xl p-3.5 cursor-grab active:cursor-grabbing transition-colors duration-150',
         isDragging && 'opacity-50',
-        overdue && 'border-red-300'
+        overdue && 'border-red-500/30 shadow-[0_0_12px_-3px_rgba(239,68,68,0.15)]'
       )}
     >
-      <CardContent className="p-3 space-y-2">
+      <div className="space-y-2.5">
         <div className="flex items-start justify-between gap-2">
-          <p className="font-medium text-sm text-slate-900 leading-tight">{item.title}</p>
-          {overdue && <AlertTriangle className="h-4 w-4 text-red-500 flex-shrink-0" />}
+          <p className="text-sm font-medium text-foreground leading-tight">{item.title}</p>
+          {overdue && <AlertTriangle className="h-4 w-4 text-red-400 flex-shrink-0" />}
         </div>
-        <p className="text-xs text-slate-500 line-clamp-2">{item.concept}</p>
+
+        {item.concept && (
+          <p className="text-xs text-muted-foreground line-clamp-2">{item.concept}</p>
+        )}
+
         <div className="flex items-center justify-between">
-          <div className="flex gap-1">
-            <Badge variant="outline" className="text-xs">{item.format}</Badge>
-            <Badge className={`text-xs ${effortColors[item.effort]}`}>E{item.effort}</Badge>
+          <div className="flex gap-1.5">
+            <span className="bg-secondary text-muted-foreground rounded-full text-xs px-2 py-0.5">
+              {item.format}
+            </span>
+            <span className={cn('rounded-full text-xs px-2 py-0.5 font-medium', effortColors[item.effort])}>
+              E{item.effort}
+            </span>
           </div>
-          <span className="text-xs text-slate-400">{formatDateShort(item.scheduled_date)}</span>
+          <span className="text-xs text-muted-foreground/60">{formatDateShort(item.scheduled_date)}</span>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }
